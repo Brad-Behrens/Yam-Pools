@@ -1,6 +1,7 @@
 var infura = ''
 var Web3 = require('web3')
 var web3 = new Web3(Web3.givenProvider || infura)
+const fetch = require('node-fetch')
 
 // Yam Pool contract addresses
 const yam_snx = '0x6c3FC1FFDb14D92394f40eeC91D9Ce8B807f132D'
@@ -28,13 +29,71 @@ var maker_pool = new web3.eth.Contract(maker_abi, yam_maker)
 var link_abi = [{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"previousOwner","type":"address"},{"indexed":true,"internalType":"address","name":"newOwner","type":"address"}],"name":"OwnershipTransferred","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"internalType":"uint256","name":"reward","type":"uint256"}],"name":"RewardAdded","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"reward","type":"uint256"}],"name":"RewardPaid","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Staked","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"internalType":"address","name":"user","type":"address"},{"indexed":false,"internalType":"uint256","name":"amount","type":"uint256"}],"name":"Withdrawn","type":"event"},{"constant":true,"inputs":[],"name":"DURATION","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"balanceOf","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"account","type":"address"}],"name":"earned","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"exit","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[],"name":"getReward","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"isOwner","outputs":[{"internalType":"bool","name":"","type":"bool"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"lastTimeRewardApplicable","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"lastUpdateTime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"link","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"reward","type":"uint256"}],"name":"notifyRewardAmount","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"periodFinish","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"renounceOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"rewardDistribution","outputs":[{"internalType":"address","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"rewardPerToken","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"rewardPerTokenStored","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"rewardRate","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"rewards","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"_rewardDistribution","type":"address"}],"name":"setRewardDistribution","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"stake","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"starttime","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"address","name":"newOwner","type":"address"}],"name":"transferOwnership","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"internalType":"address","name":"","type":"address"}],"name":"userRewardPerTokenPaid","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"internalType":"uint256","name":"amount","type":"uint256"}],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"yam","outputs":[{"internalType":"contract IERC20","name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"}]
 var link_pool = new web3.eth.Contract(link_abi, yam_link)
 
+// USD valuations
+var snx_usd = 0
+var yfi_usd = 0
+var weth_usd = 0
+var comp_usd = 0
+var lend_usd = 0
+var maker_usd = 0
+var link_usd = 0
+
+async function getSNXUSD() {
+    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=havven&vs_currencies=usd')
+    const data = await response.json()
+    snx_usd = data['havven'].usd
+}
+
+async function getWETHUSD() {
+    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=weth&vs_currencies=usd')
+    const data = await response.json()
+    weth_usd = data['weth'].usd
+}
+
+async function getCOMPUSD() {
+    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=compound-governance-token&vs_currencies=usd')
+    const data = await response.json()
+    comp_usd = data['compound-governance-token'].usd
+}
+
+async function getLENDUSD() {
+    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethlend&vs_currencies=usd')
+    const data = await response.json()
+    lend_usd = data['ethlend'].usd
+}
+
+async function getYFIUSD() {
+    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=yearn-finance&vs_currencies=usd')
+    const data = await response.json()
+    yfi_usd = data['yearn-finance'].usd
+}
+
+async function getMAKERUSD() {
+    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=maker&vs_currencies=usd')
+    const data = await response.json()
+    maker_usd = data['maker'].usd
+}
+
+async function getLINKUSD() {
+    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=chainlink&vs_currencies=usd')
+    const data = await response.json()
+    link_usd = data['chainlink'].usd
+}
+
+getSNXUSD()
+getWETHUSD()
+getCOMPUSD()
+getLENDUSD()
+getYFIUSD()
+getMAKERUSD()
+getLINKUSD()
 
 // Pool Balances Output
 console.log('****************** YAM Pool Balance ******************')
-snx_pool.methods.totalSupply().call().then(result => console.log('SNX Pool Balance: ' + (result/gwei) + ' SNX'))
-weth_pool.methods.totalSupply().call().then(result => console.log('WETH Pool Balance: ' + (result/gwei) + ' WETH'))
-comp_pool.methods.totalSupply().call().then(result => console.log('COMP Pool Balance: ' + (result/gwei) + ' COMP'))
-lend_pool.methods.totalSupply().call().then(result => console.log('LEND Pool Balance: ' + (result/gwei) + ' LEND'))
-yfi_pool.methods.totalSupply().call().then(result => console.log('YFI Pool Balance: ' + (result/gwei) + ' YFI'))
-maker_pool.methods.totalSupply().call().then(result => console.log('MAKER Pool Balance: ' + (result/gwei) + ' MAKER'))
-link_pool.methods.totalSupply().call().then(result => console.log('LINK Pool Balance: ' + (result/gwei) + ' LINK'))
+snx_pool.methods.totalSupply().call().then(result => console.log('SNX Pool Balance: ' + (result/gwei) + ' SNX' + ' USD Valuation: $ ' + (snx_usd*(result/gwei))))
+weth_pool.methods.totalSupply().call().then(result => console.log('WETH Pool Balance: ' + (result/gwei) + ' WETH' + ' USD Valuation: $ ' + (weth_usd*(result/gwei))))
+comp_pool.methods.totalSupply().call().then(result => console.log('COMP Pool Balance: ' + (result/gwei) + ' COMP' + ' USD Valuation: $ ' + (comp_usd*(result/gwei))))
+lend_pool.methods.totalSupply().call().then(result => console.log('LEND Pool Balance: ' + (result/gwei) + ' LEND' + ' USD Valuation: $' + (lend_usd*(result/gwei))))
+yfi_pool.methods.totalSupply().call().then(result => console.log('YFI Pool Balance: ' + (result/gwei) + ' YFI' + ' USD Valuation: $ ' + (yfi_usd*(result/gwei))))
+maker_pool.methods.totalSupply().call().then(result => console.log('MAKER Pool Balance: ' + (result/gwei) + ' MAKER' + ' USD Valuation: $' + (maker_usd*(result/gwei))))
+link_pool.methods.totalSupply().call().then(result => console.log('LINK Pool Balance: ' + (result/gwei) + ' LINK' + ' USD Valuation: $' + (link_usd*(result/gwei))))

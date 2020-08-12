@@ -51,10 +51,10 @@ const Output = async () => {
     snx_pool.methods.totalSupply().call().then(result => console.log('SNX Pool Balance: ' + (result/gwei) + ' SNX' + ' USD Valuation: $ ' + (tokenUSD[0]*(result/gwei))))
     weth_pool.methods.totalSupply().call().then(result => console.log('WETH Pool Balance: ' + (result/gwei) + ' WETH' + ' USD Valuation: $ ' + (tokenUSD[1]*(result/gwei))))
     comp_pool.methods.totalSupply().call().then(result => console.log('COMP Pool Balance: ' + (result/gwei) + ' COMP' + ' USD Valuation: $ ' + (tokenUSD[2]*(result/gwei))))
-    lend_pool.methods.totalSupply().call().then(result => console.log('LEND Pool Balance: ' + (result/gwei) + ' LEND' + ' USD Valuation: $' + (tokenUSD[3]*(result/gwei))))
+    lend_pool.methods.totalSupply().call().then(result => console.log('LEND Pool Balance: ' + (result/gwei) + ' LEND' + ' USD Valuation: $ ' + (tokenUSD[3]*(result/gwei))))
     yfi_pool.methods.totalSupply().call().then(result => console.log('YFI Pool Balance: ' + (result/gwei) + ' YFI' + ' USD Valuation: $ ' + (tokenUSD[4]*(result/gwei))))
-    maker_pool.methods.totalSupply().call().then(result => console.log('MAKER Pool Balance: ' + (result/gwei) + ' MAKER' + ' USD Valuation: $' + (tokenUSD[5]*(result/gwei))))
-    link_pool.methods.totalSupply().call().then(result => console.log('LINK Pool Balance: ' + (result/gwei) + ' LINK' + ' USD Valuation: $' + (tokenUSD[6]*(result/gwei))))
+    maker_pool.methods.totalSupply().call().then(result => console.log('MAKER Pool Balance: ' + (result/gwei) + ' MAKER' + ' USD Valuation: $ ' + (tokenUSD[5]*(result/gwei))))
+    link_pool.methods.totalSupply().call().then(result => console.log('LINK Pool Balance: ' + (result/gwei) + ' LINK' + ' USD Valuation: $ ' + (tokenUSD[6]*(result/gwei))))
 }
 
 // Display Output

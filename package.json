@@ -1,0 +1,26 @@
+{
+  "name": "yam-pools",
+  "version": "1.0.0",
+  "description": "A Web3.js script that extracts data from the liquidity mining pools from the highly anticipated Yam protocol displaying the total value locked (TLV) in the pools asset and it's USD valuation. To use the script simply use an Infura endpoint for the Web3 provider and run the script using node.js.",
+  "main": "yam_pools.js",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "format-number": "^3.0.0",
+    "node-fetch": "^2.6.0",
+    "web3": "^1.2.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Brad-Behrens/Yam-Pools.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Brad-Behrens/Yam-Pools/issues"
+  },
+  "homepage": "https://github.com/Brad-Behrens/Yam-Pools#readme"
+}

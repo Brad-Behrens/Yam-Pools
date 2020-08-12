@@ -8,4 +8,4 @@ Interface: https://yam.finance/farms
 
 Protocol Description: https://medium.com/@yamfinance/yam-finance-d0ad577250c7
 
-**The protocol's smart contract's are currently unaudited and pose a significant risks to yeild farmers and the staked governance tokens**
+**The protocol's smart contract's are currently unaudited and pose a significant risk to yeild farmers and potentially on-chain governance for several protocol's**

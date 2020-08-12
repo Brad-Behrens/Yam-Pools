@@ -30,70 +30,34 @@ var link_abi = [{"anonymous":false,"inputs":[{"indexed":true,"internalType":"add
 var link_pool = new web3.eth.Contract(link_abi, yam_link)
 
 // USD valuations
-var snx_usd = 0
-var yfi_usd = 0
-var weth_usd = 0
-var comp_usd = 0
-var lend_usd = 0
-var maker_usd = 0
-var link_usd = 0
+var token_id = ['havven', 'weth', 'compound-governance-token', 'ethlend', 'yearn-finance', 'maker', 'chainlink']
+var token_usd = []
 
-async function getSNXUSD() {
-    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=havven&vs_currencies=usd')
-    const data = await response.json()
-    snx_usd = data['havven'].usd
+const getUSDValue = async () => {
+    for (let i = 0; i<token_id.length; i++) {
+        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=' + token_id[i] + '&vs_currencies=usd')
+        const data = await response.json()
+        token_usd.push(data[token_id[i]].usd)
+    }
+    return token_usd
 }
-
-async function getWETHUSD() {
-    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=weth&vs_currencies=usd')
-    const data = await response.json()
-    weth_usd = data['weth'].usd
-}
-
-async function getCOMPUSD() {
-    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=compound-governance-token&vs_currencies=usd')
-    const data = await response.json()
-    comp_usd = data['compound-governance-token'].usd
-}
-
-async function getLENDUSD() {
-    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethlend&vs_currencies=usd')
-    const data = await response.json()
-    lend_usd = data['ethlend'].usd
-}
-
-async function getYFIUSD() {
-    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=yearn-finance&vs_currencies=usd')
-    const data = await response.json()
-    yfi_usd = data['yearn-finance'].usd
-}
-
-async function getMAKERUSD() {
-    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=maker&vs_currencies=usd')
-    const data = await response.json()
-    maker_usd = data['maker'].usd
-}
-
-async function getLINKUSD() {
-    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=chainlink&vs_currencies=usd')
-    const data = await response.json()
-    link_usd = data['chainlink'].usd
-}
-
-getSNXUSD()
-getWETHUSD()
-getCOMPUSD()
-getLENDUSD()
-getYFIUSD()
-getMAKERUSD()
-getLINKUSD()
 
 // Pool Balances Output
-console.log('****************** YAM Pool Balance ******************')
-snx_pool.methods.totalSupply().call().then(result => console.log('SNX Pool Balance: ' + (result/gwei) + ' SNX' + ' USD Valuation: $ ' + (snx_usd*(result/gwei))))
-weth_pool.methods.totalSupply().call().then(result => console.log('WETH Pool Balance: ' + (result/gwei) + ' WETH' + ' USD Valuation: $ ' + (weth_usd*(result/gwei))))
-comp_pool.methods.totalSupply().call().then(result => console.log('COMP Pool Balance: ' + (result/gwei) + ' COMP' + ' USD Valuation: $ ' + (comp_usd*(result/gwei))))
-lend_pool.methods.totalSupply().call().then(result => console.log('LEND Pool Balance: ' + (result/gwei) + ' LEND' + ' USD Valuation: $' + (lend_usd*(result/gwei))))
-yfi_pool.methods.totalSupply().call().then(result => console.log('YFI Pool Balance: ' + (result/gwei) + ' YFI' + ' USD Valuation: $ ' + (yfi_usd*(result/gwei))))
-maker_pool.methods.totalSupply().call().then(result => console.log('MAKER Pool Balance: ' + (result/gwei) + ' MAKER' + ' USD Valuation: $' + (maker_usd*(result/gwei))))
-link_pool.methods.totalSupply().call().then(result => console.log('LINK Pool Balance: ' + (result/gwei) + ' LINK' + ' USD Valuation: $' + (link_usd*(result/gwei))))
+const Output = async () => {
+    console.log('****************** YAM Pool Balance ******************')
+
+    const tokenUSD = await getUSDValue()
+
+    snx_pool.methods.totalSupply().call().then(result => console.log('SNX Pool Balance: ' + (result/gwei) + ' SNX' + ' USD Valuation: $ ' + (tokenUSD[0]*(result/gwei))))
+    weth_pool.methods.totalSupply().call().then(result => console.log('WETH Pool Balance: ' + (result/gwei) + ' WETH' + ' USD Valuation: $ ' + (tokenUSD[1]*(result/gwei))))
+    comp_pool.methods.totalSupply().call().then(result => console.log('COMP Pool Balance: ' + (result/gwei) + ' COMP' + ' USD Valuation: $ ' + (tokenUSD[2]*(result/gwei))))
+    lend_pool.methods.totalSupply().call().then(result => console.log('LEND Pool Balance: ' + (result/gwei) + ' LEND' + ' USD Valuation: $' + (tokenUSD[3]*(result/gwei))))
+    yfi_pool.methods.totalSupply().call().then(result => console.log('YFI Pool Balance: ' + (result/gwei) + ' YFI' + ' USD Valuation: $ ' + (tokenUSD[4]*(result/gwei))))
+    maker_pool.methods.totalSupply().call().then(result => console.log('MAKER Pool Balance: ' + (result/gwei) + ' MAKER' + ' USD Valuation: $' + (tokenUSD[5]*(result/gwei))))
+    link_pool.methods.totalSupply().call().then(result => console.log('LINK Pool Balance: ' + (result/gwei) + ' LINK' + ' USD Valuation: $' + (tokenUSD[6]*(result/gwei))))
+}
+
+// Display Output
+Output()
+
+
